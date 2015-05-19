@@ -25,15 +25,15 @@ router.post('/', function(req, res) {
 });
 
 function handleCatPic(message, user, res) {
-  sendMessage('http://lorempixel.com/400/300/cats/');
+  sendMessage('http://lorempixel.com/400/300/cats/', res);
 }
 
 function handleTest(message, user, res) {
-  sendMessage('Alright, @' + user + '. This is a test...');
+  sendMessage('Alright, @' + user + '. This is a test...', res);
 }
 
 function handleUnrecognized(message, user, res) {
-  sendMessage('Sorry. I don\'t understand your command.');
+  sendMessage('Sorry. I don\'t understand your command.', res);
 }
 
 function sendMessage(msg, res) {
