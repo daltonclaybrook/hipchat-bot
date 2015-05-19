@@ -6,11 +6,15 @@ var router = express.Router();
 
 router.post('/', function(req, res) {
 
-  //var name = req.body.item.message.from.mention_name;
-  //res.send('Hey @' + name + ', I hope this works!');
+  var name = req.body.item.message.from.mention_name;
+  var msg = 'Hey @' + name + ', I hope this works!';
+
   console.log(req.body);
-  //JSON.stringify(req.body)
-  res.send("This is just an example.");
+  res.send({
+    message: msg,
+    notify: false,
+    message_format: 'text'
+  });
 });
 
 module.exports = router;
