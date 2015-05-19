@@ -4,9 +4,15 @@ var router = express.Router();
 router.post('/', function(req, res) {
 
   console.log(req.body);
-  var fullMessage = req.body.item.message.messge;
+  var fullMessage = req.body.item.message.message;
   var user = req.body.item.message.from.mention_name;
-  var components = command.split(" ");
+  var components = command.split(' ');
+
+  if ((components.length < 1) || (components[0] != '/example')) {
+    console.log('invalid command');
+    res.send();
+    return;
+  }
 
   var command = (components.length >= 2) ? components[1] : '';
   if (command == 'cat') {
