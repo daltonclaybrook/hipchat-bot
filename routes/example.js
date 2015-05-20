@@ -25,7 +25,11 @@ router.post('/', function(req, res) {
 });
 
 function handleCatPic(message, user, res) {
-  sendMessage('http://lorempixel.com/400/300/cats/', res);
+  res.send({
+    message: '<img src="http://lorempixel.com/400/300/cats/">',
+    notify: false,
+    message_format: 'html'
+  });
 }
 
 function handleTest(message, user, res) {
