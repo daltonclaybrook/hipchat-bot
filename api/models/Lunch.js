@@ -9,6 +9,18 @@ module.exports = {
 
   attributes: {
 
+    location: {
+      type: 'string',
+      required: true
+    },
+    creator: {
+      type: 'string',
+      required: true
+    },
+    votes: {
+      type: 'integer',
+      defaultsTo: 0
+    }
+
   }
 };
-
