@@ -22,7 +22,7 @@ var self = module.exports = {
 	  }
 
 	  var command = (components.length >= 2) ? components[1] : '';
-		if (command == 'create') {
+		if (command == 'start') {
 			self.handleCreate(fullMessage, user, res);
 		} else if (command == 'add') {
 			self.handleAdd(fullMessage, user, res);
@@ -44,7 +44,7 @@ var self = module.exports = {
 			if (err) {
 				res.serverError();
 			} else {
-				var msg = "Your lunch has been created!\n";
+				var msg = "The polls are now open!\n";
 				msg += "\n\noptions:";
 				msg += "\n/lunch add <location> - nominate a location";
 				msg += "\n/lunch vote <location> - vote on a location";
@@ -121,38 +121,32 @@ var self = module.exports = {
 
 	handleStatus: function(fullMessage, user, res) {
 
+		Lunch.find()
+		.sort('votes desc')
+		.exec(function(err, lunches) {
+			if (err) {
+				res.serverError();
+			} else if (lunches.length <= 0) {
+				self.sendMessage("There are no lunches being voted on. You should add one.", res);
+			} else {
+				var msg = "Current status:\n\n";
+				var idx = 1;
+				for (var key in lunches) {
+					var lunch = lunches[key];
+					var info = idx + ".) " + lunch.location + ": " + lunch.votes + " vote(s)\n";
+					msg += info;
+					idx++;
+				}
+				self.sendMessage(msg, res);
+			}
+		});
+
 	},
 
 	deleteLunches: function(done) {
 		Lunch.destroy({}, function(err) {
 			return done(err);
     });
-	},
-
-	// OLD
-
-	handleCatPic: function(message, user, res) {
-	  res.ok({
-	    message: '<img src="http://lorempixel.com/400/300/cats/">',
-	    notify: false,
-	    message_format: 'html'
-	  });
-	},
-
-	handleTest: function(message, user, res) {
-	  self.sendMessage('Alright, @' + user + '. This is a test...', res);
-	},
-
-	handleUnrecognized: function(message, user, res) {
-	  self.sendMessage('Sorry. I don\'t understand your command.', res);
-	},
-
-	sendMessage: function(msg, res) {
-		res.ok({
-	    message: msg,
-	    notify: false,
-	    message_format: 'text'
-	  });
 	}
 
 };

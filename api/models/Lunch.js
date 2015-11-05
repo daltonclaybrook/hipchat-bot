@@ -11,7 +11,8 @@ module.exports = {
 
     location: {
       type: 'string',
-      required: true
+      required: true,
+      unique: true
     },
     creator: {
       type: 'string',
@@ -19,7 +20,7 @@ module.exports = {
     },
     votes: {
       type: 'integer',
-      defaultsTo: 0
+      defaultsTo: 1
     }
 
   }
