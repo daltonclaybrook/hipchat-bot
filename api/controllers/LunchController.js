@@ -50,6 +50,7 @@ var self = module.exports = {
 				msg += "\n\noptions:";
 				msg += "\n/lunch add <location> - nominate a location";
 				msg += "\n/lunch vote <location> - vote on a location";
+				msg += "\n/lunch veto <location> - vetoes a location";
 				msg += "\n/lunch status - view the current poles";
 
 				self.sendMessage(msg, res);
@@ -98,7 +99,7 @@ var self = module.exports = {
 				if (err) {
 					res.serverError();
 				} else if (lunch) {
-					if (lunch.vetos >= 2) {
+					if (lunch.vetoes >= 2) {
 						self.sendMessage("Sorry. " + location + " has been vetoed.", res);
 					} else {
 						var newVotes = lunch.votes + 1;
@@ -140,21 +141,21 @@ var self = module.exports = {
 					res.serverError();
 				} else if (lunch) {
 
-					var newVetos = lunch.vetos + 1;
+					var newVetoes = lunch.vetoes + 1;
 					Lunch.update({
 						id: lunch.id
 					}, {
-						vetos: newVetos
+						vetoes: newVetoes
 					})
 					.exec(function(err, lunches) {
 						if (err) {
 							res.serverError();
 						} else {
-							if (newVetos == 1) {
+							if (newVetoes == 1) {
 								self.sendMessage(location + " has 1 veto. One more and it will be removed from the list of available options.", res);
-							} else if (newVetos == 2) {
+							} else if (newVetoes == 2) {
 								self.sendMessage(location + " has been removed from the list of available options.", res);
-							} else if (newVetos > 2) {
+							} else if (newVetoes > 2) {
 								self.sendMessage("Calm down. " + location + " has already been vetoed.", res);
 							}
 						}
@@ -182,8 +183,8 @@ var self = module.exports = {
 				var idx = 1;
 				for (var key in lunches) {
 					var lunch = lunches[key];
-					if (lunch.vetos < 2) {
-						var info = idx + ".) " + lunch.location + ": " + lunch.votes + " vote(s)\n";
+					if (lunch.vetoes < 2) {
+						var info = idx + ".) " + lunch.location + ": " + lunch.votes + " vote(s), " + lunch.vetoes + " veto(es)\n";
 						msg += info;
 						idx++;
 					}
