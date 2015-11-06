@@ -147,6 +147,18 @@ var self = module.exports = {
 		Lunch.destroy({}, function(err) {
 			return done(err);
     });
+	},
+
+	handleUnrecognized: function(message, user, res) {
+	  self.sendMessage('Sorry. I don\'t understand your command.', res);
+	},
+
+	sendMessage: function(msg, res) {
+		res.ok({
+	    message: msg,
+	    notify: false,
+	    message_format: 'text'
+	  });
 	}
 
 };
