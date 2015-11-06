@@ -28,6 +28,8 @@ var self = module.exports = {
 			self.handleAdd(fullMessage, user, res);
 		} else if (command == 'vote') {
 			self.handleVote(fullMessage, user, res);
+		} else if (command == 'veto') {
+			self.handleVeto(fullMessage, user, res);
 		} else if (command == 'status') {
 			self.handleStatus(fullMessage, user, res);
 		} else {
@@ -44,7 +46,7 @@ var self = module.exports = {
 			if (err) {
 				res.serverError();
 			} else {
-				var msg = "The polls are now open!\n";
+				var msg = "The polls are now open!";
 				msg += "\n\noptions:";
 				msg += "\n/lunch add <location> - nominate a location";
 				msg += "\n/lunch vote <location> - vote on a location";
@@ -73,7 +75,7 @@ var self = module.exports = {
 				if (err) {
 					res.serverError();
 				} else {
-					self.sendMessage("Added \"" + lunch.location + "!\"", res);
+					self.sendMessage("Added \"" + lunch.location + "\"", res);
 				}
 			});
 		}
@@ -96,23 +98,70 @@ var self = module.exports = {
 				if (err) {
 					res.serverError();
 				} else if (lunch) {
+					if (lunch.vetos >= 2) {
+						self.sendMessage("Sorry. " + location + " has been vetoed.", res);
+					} else {
+						var newVotes = lunch.votes + 1;
+						Lunch.update({
+							id: lunch.id
+						}, {
+							votes: newVotes
+						})
+						.exec(function(err, lunches) {
+							if (err) {
+								res.serverError();
+							} else {
+								self.sendMessage(location + ": " + newVotes + " vote(s)", res);
+							}
+						});
+					}
+				} else {
+					self.sendMessage("Could not find a location with name: \"" + location + ".\" Do you need to add it?", res);
+				}
+			});
+		}
 
-					var newVotes = lunch.votes + 1;
+	},
+
+	handleVeto: function(fullMessage, user, res) {
+
+		// /lunch veto <location>
+		var components = fullMessage.split(' ');
+		if (components.length < 3) {
+			self.sendMessage("request must look like this: /lunch veto <location>", res);
+		} else {
+			var subComponents = components.slice(2);
+			var location = subComponents.join(' ');
+			Lunch.findOne({
+				location: location
+			})
+			.exec(function(err, lunch) {
+				if (err) {
+					res.serverError();
+				} else if (lunch) {
+
+					var newVetos = lunch.vetos + 1;
 					Lunch.update({
 						id: lunch.id
 					}, {
-						votes: newVotes
+						vetos: newVetos
 					})
 					.exec(function(err, lunches) {
 						if (err) {
 							res.serverError();
 						} else {
-							self.sendMessage("Success!\n" + location + ": " + newVotes + " vote(s)", res);
+							if (newVetos == 1) {
+								self.sendMessage(location + " has 1 veto. One more and it will be removed from the list of available options.", res);
+							} else if (newVetos == 2) {
+								self.sendMessage(location + " has been removed from the list of available options.", res);
+							} else if (newVetos > 2) {
+								self.sendMessage("Calm down. " + location + " has already been vetoed.", res);
+							}
 						}
 					});
 
 				} else {
-					self.sendMessage("Could not find a location with name: \"" + location + ".\" Do you need to add it?", res);
+					self.sendMessage("Could not find a location with name: \"" + location + ".\"", res);
 				}
 			});
 		}
@@ -133,9 +182,11 @@ var self = module.exports = {
 				var idx = 1;
 				for (var key in lunches) {
 					var lunch = lunches[key];
-					var info = idx + ".) " + lunch.location + ": " + lunch.votes + " vote(s)\n";
-					msg += info;
-					idx++;
+					if (lunch.vetos < 2) {
+						var info = idx + ".) " + lunch.location + ": " + lunch.votes + " vote(s)\n";
+						msg += info;
+						idx++;
+					}
 				}
 				self.sendMessage(msg, res);
 			}

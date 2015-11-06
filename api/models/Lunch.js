@@ -20,7 +20,11 @@ module.exports = {
     },
     votes: {
       type: 'integer',
-      defaultsTo: 1
+      defaultsTo: 0
+    },
+    vetos: {
+      type: 'integer',
+      defaultsTo: 0
     }
 
   }
