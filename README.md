@@ -7,7 +7,7 @@ a [Sails](http://sailsjs.org) application
 ### Lunch
 
 - /lunch start
-- /lunch add <location>
-- /lunch vote <location>
-- /lunch veto <location>
+- /lunch add `location`
+- /lunch vote `location`
+- /lunch veto `location`
 - /lunch status
